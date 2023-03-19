@@ -18,10 +18,15 @@ let server;
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   logger.info('Connected to MongoDB');
 
-  const io = new SocketServer(httpServer);
+  const io = new SocketServer(httpServer, {
+    cors: {
+      origin: '*',
+    },
+  });
   io.use(authSocketMiddleware);
 
   io.on('connection', onConnection);
+  logger.info('Socket.io connected');
 
   server = httpServer.listen(process.env.PORT || config.port, () => {
     logger.info(`Listening to port ${config.port}`);

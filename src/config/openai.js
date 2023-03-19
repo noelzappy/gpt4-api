@@ -12,12 +12,37 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const sendMessage = async (prompt) => {
-  const { data } = await openai.createChatCompletion({
+  const res = await openai.createChatCompletion({
     model: OPENAI_MODEL,
     messages: prompt,
   });
 
-  const { message: mesageObj } = data.choices[0];
+  // res.data.on('data', (data) => {
+  //   const lines = data
+  //     .toString()
+  //     .split('\n')
+  //     .filter((line) => line.trim() !== '');
+
+  //   /* eslint-disable no-restricted-syntax */
+  //   for (const line of lines) {
+  //     const message = line.replace(/^data: /, '');
+  //     if (message === '[DONE]') {
+  //       return '[DONE]';
+  //     }
+  //     try {
+  //       const parsed = JSON.parse(message);
+
+  //       const textObj = parsed.choices[0].delta;
+  //       handleStream(textObj);
+  //       return textObj;
+  //     } catch (error) {
+  //       handleStream({});
+  //     }
+  //   }
+  //   /* eslint-enable no-restricted-syntax */
+  // });
+
+  const { message: mesageObj } = res.data.choices[0];
 
   return mesageObj;
 };

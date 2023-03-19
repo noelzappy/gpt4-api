@@ -1,5 +1,6 @@
 const { sendMessage } = require('../config/openai');
 const { messageService } = require('../services');
+const logger = require('../config/logger');
 
 const DEFAULT_SYSTEM_MESSAGE = `You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nCurrent date: ${new Date().toISOString()}`;
 
@@ -32,6 +33,8 @@ module.exports = (socket) => {
       const { user } = socket;
       const { chat, message, parentMessage, priorMessage, priorContent, parentContent, systemMessage } = data;
 
+      logger.info(`Socket: ${user.name} sent message: ${message}`);
+
       const userMessage = {
         chat,
         message,
@@ -62,6 +65,16 @@ module.exports = (socket) => {
 
       prompt.push({ role: 'user', content: message });
 
+      // const handleStream = (textObj) => {
+      //   if (!textObj.content) {
+      //     socket.to(data.chat).emit('stopTyping', {});
+      //     return;
+      //   }
+      //   botIncomingMessage = `${botIncomingMessage} ${textObj.content}`;
+
+      //   socket.to(data.chat).emit('typing', { text: textObj.content });
+      // };
+
       const result = await sendMessage(prompt);
 
       const botMessage = {
@@ -70,6 +83,7 @@ module.exports = (socket) => {
         parentMessage,
         priorMessage,
         user: user.id,
+        sender: 'bot',
       };
 
       const msg = await messageService.createMessage(botMessage);
@@ -77,7 +91,11 @@ module.exports = (socket) => {
       socket.to(data.chat).emit('message', msg.toJSON());
       socket.to(data.chat).emit('stopTyping', {});
     } catch (e) {
-      socket.to(data.chat).emit('appError', { message: 'Error', sender: 'bot' });
+      console.log(e.response?.data);
+
+      const errorMessage = e.response?.data?.error?.messages || "Couldn't send message";
+
+      socket.to(data.chat).emit('appError', { error: errorMessage });
     }
   };
 
