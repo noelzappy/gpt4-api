@@ -91,9 +91,9 @@ module.exports = (socket) => {
       socket.to(data.chat).emit('message', msg.toJSON());
       socket.to(data.chat).emit('stopTyping', {});
     } catch (e) {
-      console.log(e.response?.data);
-
       const errorMessage = e.response?.data?.error?.messages || "Couldn't send message";
+
+      logger.error(errorMessage);
 
       socket.to(data.chat).emit('appError', { error: errorMessage });
     }
