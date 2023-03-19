@@ -3,12 +3,10 @@ const pick = require('../utils/pick');
 // const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { messageService } = require('../services');
-const gpt = require('../config/gpt');
+const { sendMessage } = require('../config/openai');
 
 const createMessage = catchAsync(async (req, res) => {
-  const result = await gpt.api.sendMessage(req.body.message, {
-    parentMessageId: req.body.parentMessageId,
-  });
+  const result = await sendMessage(req.body.message);
 
   const userMessage = {
     ...req.body,

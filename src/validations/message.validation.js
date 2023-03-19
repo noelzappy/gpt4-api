@@ -5,8 +5,8 @@ const createMessage = {
   body: Joi.object().keys({
     chat: Joi.string().custom(objectId).required(),
     message: Joi.string().required(),
-    quote: Joi.string().custom(objectId),
-    parentMessageId: Joi.string(),
+    parentMessage: Joi.string().custom(objectId),
+    priorMessage: Joi.string().custom(objectId),
   }),
 };
 

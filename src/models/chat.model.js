@@ -12,12 +12,13 @@ const chatSchema = mongoose.Schema(
       type: String,
       default: 'General',
     },
-    parentMessageId: {
-      type: String,
-    },
     date: {
       type: Date,
       default: Date.now,
+    },
+    systemMessage: {
+      type: String,
+      default: null,
     },
   },
   {

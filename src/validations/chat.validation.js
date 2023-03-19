@@ -4,6 +4,7 @@ const { objectId } = require('./custom.validation');
 const createChat = {
   body: Joi.object().keys({
     subject: Joi.string().required(),
+    systemMessage: Joi.string(),
   }),
 };
 
@@ -29,6 +30,7 @@ const updateChat = {
   body: Joi.object()
     .keys({
       subject: Joi.string().required(),
+      systemMessage: Joi.string(),
     })
     .min(1),
 };

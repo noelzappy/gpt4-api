@@ -1,12 +1,14 @@
-const gpt = require('../config/gpt');
+const { sendMessage } = require('../config/openai');
 const { messageService } = require('../services');
+
+const DEFAULT_SYSTEM_MESSAGE = `You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nCurrent date: ${new Date().toISOString()}`;
 
 module.exports = (socket) => {
   const onJoinChat = async (data) => {
     socket.join(data.chatId);
     socket.emit('loadingMessages', {});
 
-    const messages = await messageService.getLast50Messages(data.chatId);
+    const messages = await messageService.getLastMessages(data.chatId);
 
     socket.emit(
       'joinedChat',
@@ -28,38 +30,46 @@ module.exports = (socket) => {
   const onMessage = async (data) => {
     try {
       const { user } = socket;
-      const { chat, message, parentMessageId } = data;
+      const { chat, message, parentMessage, priorMessage, priorContent, parentContent, systemMessage } = data;
 
       const userMessage = {
-        ...data,
+        chat,
+        message,
+        parentMessage,
+        priorMessage,
         user: user.id,
         sender: 'user',
-        read: true,
       };
 
       const sentMessage = await messageService.createMessage(userMessage);
 
       socket.to(data.chat).emit('message', sentMessage.toJSON());
 
-      const result = await gpt.api.sendMessage(message, {
-        parentMessageId,
-        onProgress: (partialResponse) => {
-          socket.to(data.chat).emit('typing', {
-            message: partialResponse.text,
-            parentMessageId: partialResponse.parentMessageId,
-            read: true,
-            sender: 'bot',
-          });
+      socket.to(data.chat).emit('typing', {});
+      const prompt = [
+        {
+          role: 'system',
+          content: systemMessage || DEFAULT_SYSTEM_MESSAGE,
         },
-      });
+      ];
+
+      if (parentContent) {
+        prompt.push({ role: 'user', content: parentContent });
+      }
+      if (priorContent) {
+        prompt.push({ role: 'user', content: priorContent });
+      }
+
+      prompt.push({ role: 'user', content: message });
+
+      const result = await sendMessage(prompt);
 
       const botMessage = {
         chat,
+        message: result.content,
+        parentMessage,
+        priorMessage,
         user: user.id,
-        sender: 'bot',
-        message: result.text,
-        read: false,
-        parentMessageId: result.parentMessageId,
       };
 
       const msg = await messageService.createMessage(botMessage);

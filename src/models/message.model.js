@@ -14,18 +14,28 @@ const messageSchema = mongoose.Schema(
       required: true,
     },
 
-    message: { type: String, required: true },
+    message: {
+      type: String,
+      required: true,
+    },
     sender: {
       type: String,
       required: true,
       enum: ['user', 'bot'],
     },
-
-    date: { type: Date, default: Date.now },
-    read: { type: Boolean, default: false },
-    quote: { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },
-    parentMessageId: {
-      type: String,
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+    parentMessage: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Message',
+      default: null,
+    },
+    priorMessage: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Message',
+      default: null,
     },
   },
   {
