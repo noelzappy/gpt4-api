@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "gptalks",
+      "name": "gpt4-api",
       "script": "src/index.js",
       "instances": 1,
       "autorestart": true,
