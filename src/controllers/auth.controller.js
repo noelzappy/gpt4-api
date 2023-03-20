@@ -1,8 +1,16 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
+const ApiError = require('../utils/ApiError');
+
+const whiteListedEmailExtensions = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'];
 
 const register = catchAsync(async (req, res) => {
+  const { email } = req.body;
+  const emailExtension = email.split('@')[1];
+  if (!whiteListedEmailExtensions.includes(emailExtension)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email provider not allowed');
+  }
   const user = await userService.createUser(req.body);
   const tokens = await tokenService.generateAuthTokens(user);
   res.status(httpStatus.CREATED).send({ user, tokens });
