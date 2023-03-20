@@ -4,3 +4,4 @@ module.exports.chatController = require('./chat.controller');
 module.exports.messageController = require('./message.controller');
 module.exports.postController = require('./post.controller');
 module.exports.replyController = require('./reply.controller');
+module.exports.paymentController = require('./payment.controller');

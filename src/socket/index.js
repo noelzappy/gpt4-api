@@ -3,6 +3,7 @@ const chatSocket = require('./chat.socket');
 
 const onConnection = (socket) => {
   // logger.info(`Socket: ${socket.user.name} connected`);
+
   chatSocket(socket);
 };
 

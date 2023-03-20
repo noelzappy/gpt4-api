@@ -25,6 +25,7 @@ const envVarsSchema = Joi.object()
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
     OPENAI_AI_KEY: Joi.string().description('OpenAI API key'),
     OPENAI_ORD_ID: Joi.string().description('OpenAI organization ID'),
+    PAYSTACK_SECRET: Joi.string().description('Paystack secret key'),
   })
   .unknown();
 
@@ -66,5 +67,9 @@ module.exports = {
   openai: {
     apiKey: envVars.OPENAI_AI_KEY,
     orgId: envVars.OPENAI_ORD_ID,
+  },
+
+  paystack: {
+    secretKey: envVars.PAYSTACK_SECRET,
   },
 };

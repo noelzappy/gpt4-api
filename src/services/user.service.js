@@ -79,6 +79,20 @@ const deleteUserById = async (userId) => {
   return user;
 };
 
+const addCredits = async (userId, amount) => {
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  const credit = amount / 0.00056 + user.credits || 0;
+
+  Object.assign(user, { credits: credit });
+
+  await user.save();
+  return user;
+};
+
 module.exports = {
   createUser,
   queryUsers,
@@ -86,4 +100,5 @@ module.exports = {
   getUserByEmail,
   updateUserById,
   deleteUserById,
+  addCredits,
 };

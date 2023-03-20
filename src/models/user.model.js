@@ -49,6 +49,11 @@ const userSchema = mongoose.Schema(
       trim: true,
       default: 'https://picsum.photos/200/300',
     },
+
+    credits: {
+      type: Number,
+      default: 200,
+    },
   },
   {
     timestamps: true,

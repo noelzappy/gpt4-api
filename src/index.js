@@ -25,6 +25,8 @@ mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   });
   io.use(authSocketMiddleware);
 
+  global.io = io;
+
   io.on('connection', onConnection);
   logger.info('Socket.io connected');
 
