@@ -26,6 +26,7 @@ const envVarsSchema = Joi.object()
     OPENAI_AI_KEY: Joi.string().description('OpenAI API key'),
     OPENAI_ORD_ID: Joi.string().description('OpenAI organization ID'),
     PAYSTACK_SECRET: Joi.string().description('Paystack secret key'),
+    REDIS_URL: Joi.string().description('Redis url'),
   })
   .unknown();
 
@@ -72,4 +73,5 @@ module.exports = {
   paystack: {
     secretKey: envVars.PAYSTACK_SECRET,
   },
+  redisUrl: envVars.REDIS_URL,
 };

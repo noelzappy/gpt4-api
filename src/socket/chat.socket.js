@@ -1,6 +1,7 @@
 const { sendMessage } = require('../config/openai');
 const { messageService } = require('../services');
 const logger = require('../config/logger');
+const { messageWorker } = require('../workers');
 
 const DEFAULT_SYSTEM_MESSAGE = `You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nCurrent date: ${new Date().toISOString()}`;
 
@@ -49,6 +50,9 @@ module.exports = (socket) => {
       socket.to(data.chat).emit('message', sentMessage.toJSON());
 
       socket.to(data.chat).emit('typing', {});
+
+      let wordLength = 0;
+
       const prompt = [
         {
           role: 'system',
@@ -57,12 +61,15 @@ module.exports = (socket) => {
       ];
 
       if (parentContent) {
+        wordLength += parentContent.split(' ').length;
         prompt.push({ role: 'user', content: parentContent });
       }
       if (priorContent) {
+        wordLength += priorContent.split(' ').length;
         prompt.push({ role: 'user', content: priorContent });
       }
 
+      wordLength += message.split(' ').length;
       prompt.push({ role: 'user', content: message });
 
       // const handleStream = (textObj) => {
@@ -74,6 +81,13 @@ module.exports = (socket) => {
 
       //   socket.to(data.chat).emit('typing', { text: textObj.content });
       // };
+
+      if (wordLength > user.credits) {
+        socket.to(data.chat).emit('appError', { error: "You don't have enough credits to send this message" });
+        return;
+      }
+
+      messageWorker({ prompts: prompt, user });
 
       const result = await sendMessage(prompt);
 
@@ -91,9 +105,9 @@ module.exports = (socket) => {
       socket.to(data.chat).emit('message', msg.toJSON());
       socket.to(data.chat).emit('stopTyping', {});
     } catch (e) {
-      const errorMessage = e.response?.data?.error?.messages || "Couldn't send message";
+      const errorMessage = e.response?.data?.error?.messages || e.message || e;
 
-      logger.error(errorMessage);
+      logger.error(e);
 
       socket.to(data.chat).emit('appError', { error: errorMessage });
     }

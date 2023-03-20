@@ -85,7 +85,7 @@ const addCredits = async (userId, amount) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
 
-  const credit = amount / 0.00056 + user.credits || 0;
+  const credit = amount / 13 / 0.00056 + user.credits || 0;
 
   Object.assign(user, { credits: credit });
 
