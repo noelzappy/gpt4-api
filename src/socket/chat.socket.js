@@ -107,9 +107,9 @@ module.exports = (socket) => {
     } catch (e) {
       const errorMessage = e.response?.data?.error?.messages || e.message || e;
 
-      logger.error(e);
+      logger.error(errorMessage);
 
-      socket.to(data.chat).emit('appError', { error: errorMessage });
+      socket.to(data.chat).emit('appError', { error: "We could not process your request" });
     }
   };
 
