@@ -1,4 +1,4 @@
-# RESTful API for the GPTalks App
+# RESTful API for the [GPT4 Website](https://github.com/noelzappy/gpt4-website)
 
 ## Quick Start
 
